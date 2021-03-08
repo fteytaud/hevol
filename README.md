@@ -1,10 +1,11 @@
 # playWithGan
 
-#TODO
+# TODO
 
-## Front : flo :)
-## Back Web : flo
-## Back GAN : Fab
+### Front : flo :)
+### Back Web : flo
+### Back GAN : Fab
+
 
 ## Possible Options
 ### mutation : gaussian / uniform
