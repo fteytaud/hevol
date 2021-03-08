@@ -9,7 +9,7 @@ class EvolGan():
     ''' EvolGAN
     '''
 
-    def __init__(self, mu=5, llambda=25, bound=512, model='celeba', z=None, outdir='out', **_):
+    def __init__(self, mu, llambda, bound, model, outdir, z=None, **_):
         self.mu = mu
         self.llambda = llambda
         self.bound = 1 / bound
@@ -42,22 +42,32 @@ class EvolGan():
         for n, img in enumerate(generated_images):
             torchvision.utils.save_image(img, f'{self.outdir}/out_img_{n}.png')
 
-    def updateZ(self, zis, indices):
-        self.z = torch.mean(zis[indices], 0, True)
+    def saveZis(self, zis):
+        torch.save(zis, f'{self.outdir}/out_zis.pt')
 
-    def saveZ(self):
-        torch.save(self.z, f'{self.outdir}/out_z.pt')
+
+def updateZ(outdir, indices, **_):
+    zis = torch.load(f'{outdir}/out_zis.pt')
+    return torch.mean(zis[indices], 0, True)
+
+def saveZ(z, outdir, **_):
+    torch.save(z, f'{outdir}/out_z.pt')
+
 
 def main():
     # args
-    args = json.loads(sys.argv[1])
+    action = sys.argv[1]
+    kwargs = json.loads(sys.argv[2])
 
-    # evolgan
-    evolgan = EvolGan(**args)
-    zis, images = evolgan.generateImages()
-    evolgan.saveImages(images)
-    evolgan.updateZ(zis, args['select'])
-    evolgan.saveZ()
+    if action == 'generate':
+        evolgan = EvolGan(**kwargs)
+        zis, images = evolgan.generateImages()
+        evolgan.saveImages(images)
+        evolgan.saveZis(zis)
+
+    if action == 'update':
+        z = updateZ(**kwargs)
+        saveZ(z, **kwargs)
 
 if __name__ == '__main__':
     main()
