@@ -67,7 +67,7 @@ nav {
 
 #images {
   position: relative;
-  /* overscroll-behavior: contain; */
+  overscroll-behavior: contain;
 }
 
 #images img {

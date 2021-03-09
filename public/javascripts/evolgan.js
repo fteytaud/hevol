@@ -27,7 +27,7 @@ function EvolGanWelcome(props) {
     <div className="row h-100">
       <div className="col align-self-center text-center">
         <h1 className="mb-3">EvolGAN</h1>
-        <EvolGanButton onClick={props.onConnect} label="Connect to EvolGAN" lg={true} isComputing={props.isComputing} />
+        <EvolGanButton onClick={props.onConnect} label="Start" lg={true} isComputing={props.isComputing} />
       </div>
     </div>
   );
@@ -48,7 +48,7 @@ class EvolGanImage extends React.Component {
   render() {
     return (
       <span>
-        <img src="/images/out_img_256.png" className={`img-fluid ${this.state.isSelected ? 'selected' : ''}`} onClick={this.handleClick} />
+        <img src={this.props.path} className={`img-fluid ${this.state.isSelected ? 'selected' : ''}`} onClick={this.handleClick} />
       </span>
     );
   }
@@ -142,12 +142,9 @@ class EvolGanApp extends React.Component {
         </div>
         <div id="images" className={`col-9 p-3 h-100 text-center ${this.props.isComputing ? 'overflow-hidden' : 'overflow-auto' }`}>
           <div id="overlay" className={this.props.isComputing ? 'active' : ''}></div>
-          <EvolGanImage indice="1" onClick={this.props.onImage} />
-          <EvolGanImage indice="2" onClick={this.props.onImage} />
-          <EvolGanImage indice="3" onClick={this.props.onImage} />
-          <EvolGanImage indice="4" onClick={this.props.onImage} />
-          <EvolGanImage indice="5" onClick={this.props.onImage} />
-          <EvolGanImage indice="6" onClick={this.props.onImage} />
+          {this.props.images.map((image, n) => (
+            <EvolGanImage key={`img${n}`} indice={n} path={image} onClick={this.props.onImage} />
+          ))}
         </div>
       </div>
     );
@@ -167,7 +164,8 @@ class EvolGan extends React.Component {
       mu: 10,
       llambda: 20,
       bound: 512,
-      indices: {}
+      indices: {},
+      images: []
     };
     // Bind this
     this.handleConnect = this.handleConnect.bind(this);
@@ -184,8 +182,8 @@ class EvolGan extends React.Component {
       this.setState({ isComputing: false, isConnected: true });
     });
     this.socket.on('imagesGenerated', (data) => {
-      console.log(`Received ${data}`);
-      this.setState({ isComputing: false });
+      console.log(`Images generated!`);
+      this.setState({ isComputing: false, images: data.images });
     });
   }
 
@@ -212,15 +210,16 @@ class EvolGan extends React.Component {
   }
 
   handleNew() {
-    this.setState({ isComputing: true });
-    let data = {
-      model: this.state.model,
-      mu: parseInt(this.state.mu),
-      llambda: parseInt(this.state.llambda),
-      bound: parseInt(this.state.bound),
-      indices: Object.keys(this.state.indices).map(i => parseInt(i))
-    };
-    console.log(data);
+    this.setState({ isComputing: true, indices: {} }, () => {
+      let params = {
+        model: this.state.model,
+        mu: parseInt(this.state.mu),
+        llambda: parseInt(this.state.llambda),
+        bound: parseInt(this.state.bound),
+        indices: Object.keys(this.state.indices).map(i => parseInt(i))
+      };
+      this.socket.emit('new', params);
+    });
   }
 
   handleUpdate() {
@@ -231,7 +230,7 @@ class EvolGan extends React.Component {
 
   render() {
     return (this.state.isConnected ? (
-      <EvolGanApp onChange={this.handleChange} onNew={this.handleNew} onUpdate={this.handleUpdate} onImage={this.handleImage} isComputing={this.state.isComputing} model={this.state.model} mu={this.state.mu} llambda={this.state.llambda} bound={this.state.bound} />
+      <EvolGanApp onChange={this.handleChange} onNew={this.handleNew} onUpdate={this.handleUpdate} onImage={this.handleImage} isComputing={this.state.isComputing} images={this.state.images} model={this.state.model} mu={this.state.mu} llambda={this.state.llambda} bound={this.state.bound} />
     ) : (
       <EvolGanWelcome onConnect={this.handleConnect} isComputing={this.state.isComputing} />
     ));
