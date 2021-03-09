@@ -1,16 +1,105 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans&display=swap');
+
+:root {
+  --color-white: #f5f8f6;
 }
 
-a {
-  color: #00B7FF;
+html {
+  font-family: 'Open Sans', sans-serif;
 }
 
-img {
-  border: 10px solid transparent; 
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', sans-serif;
 }
 
-img.active {
-  border-color: blueviolet;
+h1 {
+  font-size: calc(32px + 5vw);
+  font-weight: 700;
+}
+
+h2 {
+  font-size: calc(16px + 1.5vw);
+  font-weight: 500;
+}
+
+h3 {
+  font-size: calc(16px + 1.15vw);
+  font-weight: 700;
+}
+
+h4 {
+  color: var(--bs-blue);
+  font-size: calc(16px + .5vw);
+  font-weight: 700;
+}
+
+h5 {
+  font-size: calc(16px + .2vw);
+  font-weight: 600;
+}
+
+header {
+  background-color: var(--bs-blue);
+  color: var(--color-white);
+}
+
+header > div {
+  padding: 100px 0;
+}
+
+nav {
+  box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 5%), inset 0 -1px 0 rgb(0 0 0 / 15%);
+  font-weight: 500;
+}
+
+#play {
+  height: 100vh;
+}
+
+#play > div {
+  background: #eee;
+  height: 100%;
+}
+
+#play h1 {
+  color: rgb(0 0 0 / 15%)
+}
+
+#images {
+  position: relative;
+  /* overscroll-behavior: contain; */
+}
+
+#images img {
+  border: 10px solid transparent;
+}
+
+#images img:hover {
+  cursor: pointer;
+  border-color: rgb(0 0 0 / 20%);
+}
+
+#images img.selected {
+  border-color: #62a1fe;
+}
+
+#overlay {
+  backdrop-filter: blur(10px) grayscale(1);
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity .5s ease;
+  z-index: -1;
+}
+
+#overlay.active {
+  opacity: 1;
+  z-index: 999;
+}
+
+#about {
+  color: var(--color-white);
 }

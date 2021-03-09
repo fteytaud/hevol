@@ -7,7 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('playwithgan:server');
 var http = require('http');
-var io = require('../src/io/server');
+var io = require('../src/io/main');
 
 /**
  * Get port from environment and store in Express.
