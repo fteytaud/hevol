@@ -33,7 +33,7 @@ const config = {
 
   py: {
     mode: 'text',
-    path: 'C:\\Users\\Flo\\anaconda3\\envs\\playwithgan\\python',
+    path: process.env.PYTHON_PATH || 'C:\\Users\\Flo\\anaconda3\\envs\\playwithgan\\python',
     script: 'src/gan/',
     main: 'main.py'
   },
