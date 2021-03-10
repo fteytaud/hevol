@@ -11,8 +11,7 @@ class EvolGan():
     OUT_IMG_PRE = 'out_img_'
     OUT_IMG_EXT = 'png'
 
-    def __init__(self, mu, llambda, bound, model, outdir, z):
-        self.mu = mu
+    def __init__(self, llambda, bound, model, outdir, z):
         self.llambda = llambda
         self.bound = 1 / bound
         self.gan = torch.hub.load(

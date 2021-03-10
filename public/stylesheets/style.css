@@ -38,6 +38,10 @@ h5 {
   font-weight: 600;
 }
 
+code {
+  color: var(--bs-primary);
+}
+
 header {
   background-color: var(--bs-blue);
   color: var(--color-white);

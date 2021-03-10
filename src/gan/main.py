@@ -1,4 +1,4 @@
-# python main.py "generate" '{\"mu\": 5, \"llambda\": 10, \"bound\": 512, \"model\": \"celeba\", \"outdir\": \"out\", \"z\": false }'
+# python main.py "generate" '{\"llambda\": 10, \"bound\": 512, \"model\": \"celeba\", \"outdir\": \"out\", \"z\": false }'
 # python main.py "update" '{\"outdir\": \"out\", \"indices\": [0, 1, 2, 3, 4] }'
 
 import sys
@@ -7,12 +7,12 @@ import torch
 
 from EvolGan import EvolGan
 
-def generate(mu, llambda, bound, model, outdir, z):
-    evolgan = EvolGan(mu, llambda, bound, model, outdir, z)
+def generate(llambda, bound, model, outdir, z, **_):
+    evolgan = EvolGan(llambda, bound, model, outdir, z)
     zis, images = evolgan.generateImages()
     evolgan.saveImages(zis, images)
 
-def update(outdir, indices):
+def update(outdir, indices, **_):
     zis = torch.load(f'{outdir}/{EvolGan.OUT_ZIS}')
     z = torch.mean(zis[indices], 0, True)
     torch.save(z, f'{outdir}/{EvolGan.OUT_Z}')

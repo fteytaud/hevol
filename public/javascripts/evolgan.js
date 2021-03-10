@@ -1,5 +1,6 @@
 'use strict';
 
+/** Spinner *******************************************************************/
 function EvolGanSpinner(props) {
   return (
     <div className="d-flex justify-content-center">
@@ -10,9 +11,17 @@ function EvolGanSpinner(props) {
   );
 }
 
+/** Loading button ************************************************************/
 function EvolGanButton(props) {
   return (
-    <a href="#play" className={`btn btn-primary ${props.lg ? 'btn-lg' : ''} ${props.isComputing ? 'disabled' : ''}`} onClick={props.onClick}>
+    <a
+        href="#play"
+        className={
+          'btn btn-primary'
+          + (props.lg ? ' btn-lg' : '')
+          + (props.isComputing ? ' disabled' : '')
+        }
+        onClick={props.onClick}>
       {props.isComputing ? (
         <EvolGanSpinner color="white" />
       ) : (
@@ -22,38 +31,46 @@ function EvolGanButton(props) {
   );
 }
 
+/** Welcome *******************************************************************/
 function EvolGanWelcome(props) {
   return (
     <div className="row h-100">
       <div className="col align-self-center text-center">
         <h1 className="mb-3">EvolGAN</h1>
-        <EvolGanButton onClick={props.onConnect} label="Start" lg={true} isComputing={props.isComputing} />
+        <EvolGanButton
+            onClick={props.onConnect}
+            label="Start"
+            lg={true}
+            isComputing={props.isComputing} />
       </div>
     </div>
   );
 }
 
+/** Image *********************************************************************/
 class EvolGanImage extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { isSelected: false };
     this.handleClick = this.handleClick.bind(this);
   }
 
   handleClick() {
-    this.setState((state) => ({ isSelected: !state.isSelected }));
-    this.props.onClick(this.props.indice);
+    this.props.onImage(this.props.indice);
   }
 
   render() {
     return (
       <span>
-        <img src={this.props.path} className={`img-fluid ${this.state.isSelected ? 'selected' : ''}`} onClick={this.handleClick} />
+        <img 
+            src={this.props.path}
+            className={`img-fluid ${this.props.isSelected ? 'selected' : ''}`}
+            onClick={this.handleClick} />
       </span>
     );
   }
 }
 
+/** Select ********************************************************************/
 class EvolGanSelect extends React.Component {
   constructor(props) {
     super(props);
@@ -77,6 +94,7 @@ class EvolGanSelect extends React.Component {
   }
 }
 
+/** Range *********************************************************************/
 class EvolGanRange extends React.Component {
   constructor(props) {
     super(props);
@@ -98,59 +116,116 @@ class EvolGanRange extends React.Component {
         <code className="px-2">
           {this.state.value}
         </code>
-        <input type="range" className="form-range" min={this.props.min} max={this.props.max} id={this.props.identifier} value={this.state.value} onChange={this.handleChange} />
+        <input
+            type="range"
+            id={this.props.identifier}
+            className="form-range"
+            min={this.props.min}
+            max={this.props.max}
+            value={this.state.value}
+            onChange={this.handleChange} />
       </div>
     );
   }
 }
 
-class EvolGanApp extends React.Component {
-  constructor(props) {
-    super(props);
-    this.handleChange = this.handleChange.bind(this);
-  }
-
-  handleChange(identifier, value) {
-    this.props.onChange(identifier, value);
-  }
-
-  render() {
-    return (
-      <div className="row h-100">
-        <div className="col-3 p-3">
-          <div className="bg-body p-3 shadow">
-            <h4>EvolGAN</h4>
-            <hr />
-            <h5>Model</h5>
-            <EvolGanSelect identifier="model" init={this.props.model} onChange={this.handleChange} />
-            <h5 className="mt-3">Settings</h5>
-            <EvolGanRange identifier="mu" label="Mu" min="0" max="20" init={this.props.mu} onChange={this.handleChange} />
-            <EvolGanRange identifier="llambda" label="Images" min="5" max="25" init={this.props.llambda} onChange={this.handleChange} />
-            <EvolGanRange identifier="bound" label="Variation (⅟ )" min="1" max="512" init={this.props.bound} onChange={this.handleChange} />
-            <hr />
-            {this.props.isComputing ? (
-              <div>
-                <EvolGanSpinner color="primary" />
-              </div>
-            ) : (
-              <div className="d-grid gap-2">
-                <EvolGanButton onClick={this.props.onNew} label="New" lg={false} isComputing={this.props.isComputing} />
-                <EvolGanButton onClick={this.props.onUpdate} label="Update" lg={false} isComputing={this.props.isComputing} />
-              </div>
-            )}
+/** Settings ******************************************************************/
+function EvolGanSettings(props) {
+  return (
+    <div className="col-3 p-3">
+      <div className="bg-body p-3 shadow">
+        <h4>EvolGAN</h4>
+        <hr />
+        <h5>Model</h5>
+        <EvolGanSelect 
+            identifier="model"
+            init={props.model}
+            onChange={props.onChange} />
+        <h5 className="mt-3">Settings</h5>
+        <EvolGanRange
+            identifier="llambda"
+            label="Images"
+            min="5"
+            max="25"
+            init={props.llambda}
+            onChange={props.onChange} />
+        <EvolGanRange
+            identifier="bound"
+            label="Variation ⅟"
+            min="1"
+            max="512"
+            init={props.bound}
+            onChange={props.onChange} />
+        <hr />
+        {props.isComputing ? (
+          <div>
+            <EvolGanSpinner color="primary" />
           </div>
-        </div>
-        <div id="images" className={`col-9 p-3 h-100 text-center ${this.props.isComputing ? 'overflow-hidden' : 'overflow-auto' }`}>
-          <div id="overlay" className={this.props.isComputing ? 'active' : ''}></div>
-          {this.props.images.map((image, n) => (
-            <EvolGanImage key={`img${n}`} indice={n} path={image} onClick={this.props.onImage} />
-          ))}
-        </div>
+        ) : (
+          <div className="d-grid gap-2">
+            <EvolGanButton
+                onClick={props.onNew}
+                label="New"
+                lg={false}
+                isComputing={props.isComputing} />
+            <EvolGanButton
+                onClick={props.onUpdate}
+                label="Update"
+                lg={false}
+                isComputing={props.isComputing} />
+          </div>
+        )}
       </div>
-    );
-  }
+    </div>
+  );
 }
 
+/** Images ********************************************************************/
+function EvolGanImages(props) {
+  return (
+    <div
+        id="images"
+        className={
+          'col-9 p-3 h-100 text-center '
+          + (props.isComputing ? 'overflow-hidden' : 'overflow-auto')
+        }>
+      <div id="overlay" className={props.isComputing ? 'active' : ''}></div>
+      {props.images.map((image, n) => (
+        <EvolGanImage
+            key={`img_${n}`}
+            indice={n}
+            path={image}
+            isSelected={
+              Object.keys(props.indices).map(key => parseInt(key)).includes(n)
+            }
+            onImage={props.onImage} />
+      ))}
+    </div>
+  );
+}
+
+/** App ***********************************************************************/
+function EvolGanApp(props) {
+  return (
+    <div className="row h-100">
+      <EvolGanSettings
+          onChange={props.onChange}
+          onNew={props.onNew}
+          onUpdate={props.onUpdate}
+          isComputing={props.isComputing}
+          model={props.model}
+          llambda={props.llambda}
+          bound={props.bound} />
+      <EvolGanImages 
+          onImage={props.onImage}
+          isComputing={props.isComputing}
+          images={props.images}
+          indices={props.indices} />
+    </div>
+  );
+}
+
+/** EvolGan *******************************************************************/
 class EvolGan extends React.Component {
   constructor(props) {
     super(props);
@@ -161,8 +236,7 @@ class EvolGan extends React.Component {
       isComputing: false,
       isConnected: false,
       model: 'celeba',
-      mu: 10,
-      llambda: 20,
+      llambda: 15,
       bound: 512,
       indices: {},
       images: []
@@ -183,7 +257,11 @@ class EvolGan extends React.Component {
     });
     this.socket.on('imagesGenerated', (data) => {
       console.log(`Images generated!`);
-      this.setState({ isComputing: false, images: data.images });
+      this.setState({ isComputing: false, images: data.images, indices: {} });
+    });
+    this.socket.on('unlock', () => {
+      console.log('Unlock!');
+      this.setState({ isComputing: false });
     });
   }
 
@@ -210,29 +288,45 @@ class EvolGan extends React.Component {
   }
 
   handleNew() {
-    this.setState({ isComputing: true, indices: {} }, () => {
-      let params = {
-        model: this.state.model,
-        mu: parseInt(this.state.mu),
-        llambda: parseInt(this.state.llambda),
-        bound: parseInt(this.state.bound),
-        indices: Object.keys(this.state.indices).map(i => parseInt(i))
-      };
-      this.socket.emit('new', params);
+    this.setState({ isComputing: true }, () => {
+      let data = this.prepare();
+      this.socket.emit('new', data);
     });
   }
 
   handleUpdate() {
     this.setState({ isComputing: true }, () => {
-      this.socket.emit('update');
+      let data = this.prepare();
+      this.socket.emit('update', data);
+    });
+  }
+
+  prepare() {
+    return ({
+      model: this.state.model,
+      llambda: parseInt(this.state.llambda),
+      bound: parseInt(this.state.bound),
+      indices: Object.keys(this.state.indices).map(i => parseInt(i))
     });
   }
 
   render() {
     return (this.state.isConnected ? (
-      <EvolGanApp onChange={this.handleChange} onNew={this.handleNew} onUpdate={this.handleUpdate} onImage={this.handleImage} isComputing={this.state.isComputing} images={this.state.images} model={this.state.model} mu={this.state.mu} llambda={this.state.llambda} bound={this.state.bound} />
+      <EvolGanApp
+          onChange={this.handleChange}
+          onNew={this.handleNew}
+          onUpdate={this.handleUpdate}
+          onImage={this.handleImage}
+          isComputing={this.state.isComputing}
+          images={this.state.images}
+          indices={this.state.indices}
+          model={this.state.model}
+          llambda={this.state.llambda}
+          bound={this.state.bound} />
     ) : (
-      <EvolGanWelcome onConnect={this.handleConnect} isComputing={this.state.isComputing} />
+      <EvolGanWelcome
+          onConnect={this.handleConnect}
+          isComputing={this.state.isComputing} />
     ));
   }
 }

@@ -3,80 +3,126 @@ const path = require('path');
 const socketio = require('socket.io');
 const { PythonShell } = require('python-shell');
 
-const OUT_DIR = './public/out';
-const OUT_Z = 'out_z.pt';
+const config = require('./config');
 
-const MU_MIN = 0;
-const MU_MAX = 20;
-const LLAMBDA_MIN = 5;
-const LLAMBDA_MAX = 25;
-const BOUND_MIN = 1;
-const BOUND_MAX = 512;
-const MODELS = ['celeba', 'celebAHQ-256', 'celebAHQ-512'];
+/** Binding *******************************************************************/
 
-const PY_MODE = 'text';
-const PY_PATH = 'C:\\Users\\Flo\\anaconda3\\envs\\playwithgan\\python';
-const PY_SCRIPT = 'src/gan/';
-const PY_MAIN = 'main.py';
-
-function check_num(num, min, max) {
-  return Math.min(Math.max(parseInt(num), min), max);
-}
-
-function check_model(model) {
-  return (MODELS.includes(model) ? model : MODELS[0]);
-}
-
-function createSession(id) {
-  fs.mkdirSync(path.join(OUT_DIR, id), { recursive: true });
-}
-
-function deleteSession(id) {
-  fs.rmdirSync(path.join(OUT_DIR, id), { recursive: true });
-}
-
-function generateImages(socket, params) {
+function generateImages(lock, socket, data) {
   const kwargs = {
-    mu: check_num(params.mu, MU_MIN, MU_MAX),
-    llambda: check_num(params.llambda, LLAMBDA_MIN, LLAMBDA_MAX),
-    bound: check_num(params.bound, BOUND_MIN, BOUND_MAX),
-    model: check_model(params.model),
-    outdir: path.join(OUT_DIR, socket.id),
-    z: fs.existsSync(path.join(OUT_DIR, socket.id, OUT_Z))
+    llambda: config.check.num(
+      data.llambda, config.params.llambda_min, config.params.llambda_max
+    ),
+    bound: config.check.num(
+      data.bound, config.params.bound_min, config.params.bound_max
+    ),
+    model: config.check.model(data.model),
+    outdir: path.join(config.out.fulldir, socket.id),
+    z: fs.existsSync(path.join(config.out.fulldir, socket.id, config.out.z))
   };
 
   const options = {
-    mode: PY_MODE,
-    pythonPath: PY_PATH,
-    scriptPath: PY_SCRIPT,
+    mode: config.py.mode,
+    pythonPath: config.py.path,
+    scriptPath: config.py.script,
     args: ['generate', JSON.stringify(kwargs)]
   };
 
-  PythonShell.run(PY_MAIN, options, function (err, results) {
+  PythonShell.run(config.py.main, options, function (err, _) {
     if (err) throw err;
-    const t = new Date().getTime();
-    const images = Array.from(
-      { length: kwargs.llambda }, (val, key) => key
-    ).map(key => `/out/${socket.id}/out_img_${key}.png?t=${t}`);
+    const images = Array.from({ length: kwargs.llambda }, (_, key) => key).map(
+      key =>   '/' + config.out.dir
+             + '/' + socket.id 
+             + '/' + config.out.img_pre + key + '.' + config.out.img_ext
+             + '?t=' + new Date().getTime()
+    );
     socket.emit('imagesGenerated', { images });
+    delete lock[socket.id];
   });
 }
+
+function updateImages(lock, socket, data) {
+  const outdir = path.join(config.out.fulldir, socket.id);
+  const images = fs.readdirSync(outdir).filter(
+    file => file.endsWith(config.out.img_ext)
+  );
+  const kwargs = {
+    outdir,
+    indices: config.check.indices(data.indices, images.length)
+  };
+  const options = {
+    mode: config.py.mode,
+    pythonPath: config.py.path,
+    scriptPath: config.py.script,
+    args: ['update', JSON.stringify(kwargs)]
+  };
+
+  PythonShell.run(config.py.main, options, function (err, _) {
+    if (err) throw err;
+    generateImages(lock, socket, data);
+  });
+}
+
+/** Handlers ******************************************************************/
+
+function handleConnection(socket) {
+  fs.mkdirSync(path.join(config.out.fulldir, socket.id), { recursive: true });
+  socket.emit('isConnected');
+}
+
+function handleDisconnect(lock, socket) {
+  if (lock[socket.id]) {
+    setTimeout(() => handleDisconnect(lock, socket), 10000);
+  }
+  else {
+    fs.rmdirSync(path.join(config.out.fulldir, socket.id), { recursive: true });
+    delete lock[socket.id];
+  }
+}
+
+function handleNew(lock, socket, data) {
+  if (lock[socket.id]) return;
+  lock[socket.id] = true;
+  fs.rmSync(
+    path.join(config.out.fulldir, socket.id, config.out.z), 
+    { force: true });
+  fs.rmSync(
+    path.join(config.out.fulldir, socket.id, config.out.zis),
+    { force: true });
+  generateImages(lock, socket, data);
+}
+
+function handleUpdate(lock, socket, data) {
+  if (lock[socket.id]) return;
+  lock[socket.id] = true;
+  if (fs.existsSync(path.join(config.out.fulldir, socket.id, config.out.zis))) {
+    updateImages(lock, socket, data);
+  }
+  else {
+    socket.emit('unlock');
+  }
+}
+
+/** io server *****************************************************************/
 
 function io(server) {
 
   const io = socketio(server);
 
+  const lock = {};
+
   io.on('connection', (socket) => {
 
     // Handle connection
-    createSession(socket.id);
-    socket.emit('isConnected');
+    handleConnection(socket);
 
-    // Handle client messages
-    socket.on('new', (params) => generateImages(socket, params));
+    // Handle new
+    socket.on('new', (data) => handleNew(lock, socket, data));
+
+    // Handle update
+    socket.on('update', (data) => handleUpdate(lock, socket, data));
 
     // Handle disconnect
-    socket.on('disconnect', () => deleteSession(socket.id));
+    socket.on('disconnect', () => handleDisconnect(lock, socket));
 
   });
 
