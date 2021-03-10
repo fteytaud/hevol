@@ -70,8 +70,13 @@ nav {
 }
 
 #images {
-  position: relative;
-  overscroll-behavior: contain;
+  /* overscroll-behavior: contain; */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+#images::-webkit-scrollbar {
+  display: none;
 }
 
 #images img {

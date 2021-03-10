@@ -85,7 +85,10 @@ class EvolGanSelect extends React.Component {
 
   render() {
     return (
-      <select className="form-select" onChange={this.handleChange}>
+      <select
+          className="form-select"
+          value={this.state.value}
+          onChange={this.handleChange}>
         <option value="celeba">Celeba (128x128)</option>
         <option value="celebAHQ-256">Celeba (256x256)</option>
         <option value="celebAHQ-512">Celeba (512x512)</option>
@@ -183,23 +186,20 @@ function EvolGanSettings(props) {
 /** Images ********************************************************************/
 function EvolGanImages(props) {
   return (
-    <div
-        id="images"
-        className={
-          'col-9 p-3 h-100 text-center '
-          + (props.isComputing ? 'overflow-hidden' : 'overflow-auto')
-        }>
+    <div className="col-9 p-3 h-100 text-center position-relative">
       <div id="overlay" className={props.isComputing ? 'active' : ''}></div>
-      {props.images.map((image, n) => (
-        <EvolGanImage
-            key={`img_${n}`}
-            indice={n}
-            path={image}
-            isSelected={
-              Object.keys(props.indices).map(key => parseInt(key)).includes(n)
-            }
-            onImage={props.onImage} />
-      ))}
+      <div id="images" className="h-100 overflow-auto">
+        {props.images.map((image, n) => (
+          <EvolGanImage
+              key={`img_${n}`}
+              indice={n}
+              path={image}
+              isSelected={
+                Object.keys(props.indices).map(key => parseInt(key)).includes(n)
+              }
+              onImage={props.onImage} />
+        ))}
+      </div>
     </div>
   );
 }
@@ -235,9 +235,9 @@ class EvolGan extends React.Component {
     this.state = {
       isComputing: false,
       isConnected: false,
-      model: 'celeba',
-      llambda: 15,
-      bound: 512,
+      model: 'celebAHQ-256',
+      llambda: 16,
+      bound: 64,
       indices: {},
       images: []
     };
