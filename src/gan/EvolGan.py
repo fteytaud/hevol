@@ -22,9 +22,11 @@ class EvolGan():
             useGPU=False
         )
         self.outdir = outdir
-        self.z = torch.load(f'{outdir}/{EvolGan.OUT_Z}') if z else torch.randn((1, 512))
+        self.z = torch.load(f'{outdir}/{EvolGan.OUT_Z}') if z else torch.randn((self.llambda, 512))
 
     def generateZis(self):
+        if self.z.shape[0] != 1:
+            return self.z
         zis = torch.cat(self.llambda * [self.z])
         for i in range(zis.shape[0]):
             for j in range(zis.shape[1]):
