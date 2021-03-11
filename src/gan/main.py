@@ -9,8 +9,7 @@ from EvolGan import EvolGan
 
 def generate(llambda, bound, model, outdir, z, **_):
     evolgan = EvolGan(llambda, bound, model, outdir, z)
-    zis, images = evolgan.generateImages()
-    evolgan.saveImages(zis, images)
+    evolgan.generateImages()
 
 def update(outdir, indices, **_):
     zis = torch.load(f'{outdir}/{EvolGan.OUT_ZIS}')

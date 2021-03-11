@@ -38,13 +38,8 @@ class EvolGan():
     def generateImages(self):
         zis = self.generateZis()
         with torch.no_grad():
-            images = self.gan.test(zis)
-        return zis, images
-        
-    def saveImages(self, zis, images):
-        for n, img in enumerate(images):
-            torchvision.utils.save_image(img, f'{self.outdir}/{EvolGan.OUT_IMG_PRE}{n}.{EvolGan.OUT_IMG_EXT}')
+            for n, z in enumerate(zis):
+                image = self.gan.test(torch.stack([z]))
+                torchvision.utils.save_image(image, f'{self.outdir}/{EvolGan.OUT_IMG_PRE}{n}.{EvolGan.OUT_IMG_EXT}')
         torch.save(zis, f'{self.outdir}/{EvolGan.OUT_ZIS}')
 
-    def updateZ(self, zis, indices):
-        self.z = torch.mean(zis[indices], 0, True)
