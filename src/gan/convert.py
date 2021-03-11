@@ -10,7 +10,7 @@ def main():
     )
     gan.netG.eval()
     dummy_input = torch.zeros(1, 512)
-    torch.onnx.export(gan.netG, dummy_input, 'onnx_evolgan.onnx', verbose=True)
+    torch.onnx.export(gan.netG, dummy_input, 'onnx_evolgan_netG.onnx', verbose=True)
 
 if __name__ == '__main__':
     main()
