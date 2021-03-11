@@ -4,7 +4,6 @@
 import sys
 import json
 import torch
-from torchsummary import summary
 
 from EvolGan import EvolGan
 
@@ -28,7 +27,7 @@ def main():
     # run
     if action == 'generate': return generate(**kwargs)
     if action == 'update': return update(**kwargs)
-    if action == 'save': return test(**kwargs)
+    if action == 'save': return save(**kwargs)
 
 if __name__ == '__main__':
     main()
