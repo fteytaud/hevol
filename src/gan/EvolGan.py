@@ -39,6 +39,7 @@ class EvolGan():
         zis = self.generateZis()
         with torch.no_grad():
             for n, z in enumerate(zis):
+                print(z.shape)
                 image = self.gan.test(torch.stack([z]))
                 torchvision.utils.save_image(image, f'{self.outdir}/{EvolGan.OUT_IMG_PRE}{n}.{EvolGan.OUT_IMG_EXT}')
         torch.save(zis, f'{self.outdir}/{EvolGan.OUT_ZIS}')
