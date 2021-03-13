@@ -214,7 +214,7 @@ class EvolGanApp extends React.Component {
     this.handleMessages();
     // State
     this.state = {
-      model: 'celeba_no_compress',
+      model: 'celeba_2x_compress',
       lambda: 10,
       bound: 64,
       indices: [],
