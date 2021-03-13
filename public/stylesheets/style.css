@@ -57,16 +57,7 @@ nav {
 }
 
 #play {
-  height: 100vh;
-}
-
-#play > div {
   background: #eee;
-  height: 100%;
-}
-
-#play h1 {
-  color: rgb(0 0 0 / 15%)
 }
 
 #images {
@@ -79,34 +70,22 @@ nav {
   display: none;
 }
 
-#images img {
+#images canvas {
   border: 10px solid transparent;
+  transition: filter .15s ease;
 }
 
-#images img:hover {
+#images canvas:not(.not-ready):hover {
   cursor: pointer;
   border-color: rgb(0 0 0 / 20%);
 }
 
-#images img.selected {
-  border-color: #62a1fe;
+#images canvas.selected {
+  border-color: #62a1fe !important;
 }
 
-#overlay {
-  backdrop-filter: blur(10px) grayscale(1);
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  opacity: 0;
-  transition: opacity .5s ease;
-  z-index: -1;
-}
-
-#overlay.active {
-  opacity: 1;
-  z-index: 999;
+#images canvas.not-ready {
+  filter: blur(5px) grayscale(1);
 }
 
 #about {

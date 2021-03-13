@@ -65,13 +65,7 @@
   </div>
 
   <!-- Play -->
-  <div id="play">
-    <div>
-      <div class="container-fluid">
-        <div id="evolgan_app"></div>
-      </div>
-    </div>
-  </div>
+  <div id="play" class="container-fluid vh-100"></div>
 
   <!-- Papers -->
   <div id="papers" class="container my-5">
@@ -112,11 +106,12 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="/javascripts/evolgan.js" type="text/babel"></script>
+  <script src="/javascripts/evolgan.js"></script>
+  <script src="/javascripts/evolgan_app.js" type="text/babel"></script>
 </body>
 
 </html>
