@@ -21,9 +21,9 @@ class EvolGanSettingsModel extends React.Component {
           className="form-select mb-3"
           value={this.state.value}
           onChange={this.handleChange}>
-        <option value="celeba">Celeba (128x128)</option>
-        <option value="celebAHQ-256">Celeba (256x256)</option>
-        <option value="celebAHQ-512">Celeba (512x512)</option>
+        <option value="celeba_2x_compress">Celeba (128x128)</option>
+        <option value="celebAHQ-256_2x_compress">Celeba (256x256)</option>
+        <option value="celebAHQ-512_2x_compress">Celeba (512x512)</option>
       </select>
     );
   }
@@ -165,11 +165,7 @@ class EvolGanCanvas extends React.Component {
 
   componentDidMount() {
     const ctx = this.refs.canvas.getContext('2d');
-    const image = new ImageData(
-      this.props.image,
-      this.props.datasize,
-      this.props.datasize);
-    ctx.putImageData(image, 0, 0);
+    ctx.putImageData(this.props.image, 0, 0);
   }
 
   componentDidUpdate() {
@@ -180,8 +176,8 @@ class EvolGanCanvas extends React.Component {
     return (
       <canvas
           ref="canvas"
-          width={this.props.datasize}
-          height={this.props.datasize}
+          width={this.props.image.width}
+          height={this.props.image.height}
           className={`
             ${this.props.ready ? 'ready' : 'not-ready'}
             ${this.props.select ? 'selected' : 'not-selected'}
@@ -202,7 +198,6 @@ class EvolGanImages extends React.Component {
               index={i}
               image={image}
               ready={this.props.ready[i]}
-              datasize={this.props.datasize}
               select={this.props.indices.includes(i)}
               onClickCanvas={this.props.onClickCanvas} />
         ))}
@@ -214,15 +209,12 @@ class EvolGanImages extends React.Component {
 class EvolGanApp extends React.Component {
   constructor(props) {
     super(props);
-    // Const
-    this.datasizes = { 'celeba': 128, 'celeba-256': 256, 'celeba-512': 512 };
     // Evolgan
     this.evolgan = new EvolGan();
     this.handleMessages();
     // State
     this.state = {
-      datasize: 256,
-      model: 'celebAHQ-256',
+      model: 'celeba_no_compress',
       lambda: 10,
       bound: 64,
       indices: [],
@@ -252,7 +244,7 @@ class EvolGanApp extends React.Component {
   }
 
   handleChangeModel(model) {
-    this.setState({ model: model, datasize: this.datasizes[model] });
+    this.setState({ model: model });
   }
 
   handleChangeSettings(settings, value) {
@@ -315,7 +307,6 @@ class EvolGanApp extends React.Component {
             onClickNew={this.handleClickNew}
             onClickUpdate={this.handleClickUpdate} />
         <EvolGanImages
-            datasize={this.state.datasize}
             indices={this.state.indices}
             images={this.state.images}
             ready={this.state.ready}

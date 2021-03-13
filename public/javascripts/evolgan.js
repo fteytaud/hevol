@@ -2,8 +2,13 @@
 
 class EvolGan {
   constructor() {
-    this.zis = undefined;
     this.worker = new Worker('/javascripts/evolgan_worker.js');
+    this.zis = undefined;
+    this.imageSizes = {
+      'celeba_2x_compress': 128,
+      'celebAHQ-256_2x_compress': 256,
+      'celebAHQ-512_2x_compress': 512,
+    };
   }
 
   mean(indices) {
@@ -32,7 +37,8 @@ class EvolGan {
   work(model) {
     this.worker.postMessage({
       model: model,
-      zis: this.zis.arraySync()
+      zis: this.zis.arraySync(),
+      imageSize: this.imageSizes[model]
     });
   }
 

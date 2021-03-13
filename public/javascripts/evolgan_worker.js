@@ -1,6 +1,6 @@
 importScripts("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs");
 
-async function generate(model, zis) {
+async function generate(model, zis, imageSize) {
   // Load model
   const gan =  await tf.loadGraphModel(`/models/${model}/model.json`);
   // Generate images (1 by 1)
@@ -13,10 +13,12 @@ async function generate(model, zis) {
        .cast('int32')
     );
     // Notify main thread
-    postMessage({ i, image });
+    postMessage({ i, image: new ImageData(image, imageSize) });
+    // Dispose
+    y.dispose();
   }
 }
 
 onmessage = async function(message) {
-  generate(message.data.model, message.data.zis);
+  generate(message.data.model, message.data.zis, message.data.imageSize);
 }
