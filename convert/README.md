@@ -2,9 +2,9 @@ From: [source](https://medium.com/@pnitsan/exporting-and-running-a-deep-learning
 
 ```sh
 # convert PyTorch to ONNX
-python convert.py celeba
-python convert.py celebAHQ-256
-python convert.py celebAHQ-512
+python pt2onnx.py celeba
+python pt2onnx.py celebAHQ-256
+python pt2onnx.py celebAHQ-512
 
 # convert ONNX to TensorFlow
 onnx-tf convert -i celeba.onnx -o celeba.pb
